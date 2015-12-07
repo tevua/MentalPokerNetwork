@@ -119,8 +119,19 @@ public class OwnTrustManager implements X509TrustManager {
 			return false;
 		}
 	}
-	
-	private boolean verifyCert(X509Certificate root, X509Certificate cert) throws CertificateException{
+
+	/**
+	 * Verifies a sign with a given root certificate.
+	 * 
+	 * @param root
+	 *            the root certificate
+	 * @param cert
+	 *            the certificate to verify
+	 * @return true if the certificate was verified
+	 * @throws CertificateException
+	 *             we do not accept certificate
+	 */
+	private boolean verifyCert(X509Certificate root, X509Certificate cert) throws CertificateException {
 		try {
 			PublicKey key = root.getPublicKey();
 			cert.verify(key);
@@ -226,7 +237,8 @@ public class OwnTrustManager implements X509TrustManager {
 
 	/**
 	 * Checks if the original certificate is a certificate authority (and thus
-	 * allowed to sign certs).
+	 * allowed to sign certs). Does not expect that there is a proper
+	 * certificate chain.
 	 * 
 	 * @throws CertificateException
 	 *             if the original certificate used to verify the other one is
@@ -243,29 +255,32 @@ public class OwnTrustManager implements X509TrustManager {
 		// certification path.
 		for (X509Certificate cert : rootCerts) {
 			if (cert.getBasicConstraints() == -1) {
-				//check if this certificate was used to verify the original one...
+				// check if this certificate was used to verify the original
+				// one...
 				if (verifyCert(cert, chain[0])) {
 					if (cert.getBasicConstraints() == -1) {
-						// not a ca .. cert might still be okay, if the one in the chain is
+						// not a ca .. cert might still be okay, if the one in
+						// the chain is
 						// the same one used to verify it
 						if (!(chain[0].equals(cert))) {
 							throw new CertificateException();
 						}
+					}
 				}
 			}
-			}}
+		}
 	}
 
 	@Override
 	public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-		//System.out.println("checkClientTrusted");
+		// System.out.println("checkClientTrusted");
 		try {
 			// This will call the original trust manager
 			// which will throw an exception if it doesn't know the certificate
 			originalManager.checkClientTrusted(chain, authType);
-			
+
 			checkOriginalIsCA(chain);
-			
+
 		} catch (CertificateException e) {
 			checkTrusted(chain, authType);
 		}
