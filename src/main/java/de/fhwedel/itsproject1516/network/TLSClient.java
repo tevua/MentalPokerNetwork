@@ -5,12 +5,14 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 
 import java.io.PrintWriter;
-
+import java.security.PublicKey;
 
 import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.HandshakeCompletedListener;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
@@ -120,5 +122,18 @@ public class TLSClient {
 	public synchronized void received(String message) {
 		// this.log("Received: " + message);
 		this.networkComm.receivedMessage(message);
+	}
+
+	/**
+	 * Returns the public key of the peer we connected to.
+	 * 
+	 * @return the public key
+	 * @throws SSLPeerUnverifiedException
+	 *             if the peer wasn't verified
+	 */
+	public synchronized PublicKey getOtherPubKey() throws SSLPeerUnverifiedException {
+		SSLSession session = this.tlsSocket.getSession();
+		java.security.cert.Certificate cert = session.getPeerCertificates()[0];
+		return cert.getPublicKey();
 	}
 }

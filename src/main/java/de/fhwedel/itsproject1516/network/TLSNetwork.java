@@ -8,6 +8,7 @@ import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
@@ -17,6 +18,7 @@ import java.util.List;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
@@ -138,7 +140,7 @@ public class TLSNetwork {
 	 */
 	public void receivedMessage(String message) {
 		// TODO
-		//System.out.println(message);
+		// System.out.println(message);
 		messages.add(message);
 	}
 
@@ -173,6 +175,23 @@ public class TLSNetwork {
 			this.client.disconnect();
 		} else if (this.server != null) {
 			this.server.stop();
+		}
+	}
+
+	/**
+	 * Gets the public key of the peer we connected to.
+	 * 
+	 * @return the public key of the peer we connected to.
+	 * @throws SSLPeerUnverifiedException
+	 *             if the peer is unverified
+	 */
+	public PublicKey getOtherPubKey() throws SSLPeerUnverifiedException {
+		if (this.client != null) {
+			return this.client.getOtherPubKey();
+		} else if (this.server != null) {
+			return this.server.getOtherPubKey();
+		} else {
+			return null;
 		}
 	}
 

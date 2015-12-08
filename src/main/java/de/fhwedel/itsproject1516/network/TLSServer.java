@@ -6,14 +6,16 @@ import java.io.IOException;
 
 import java.io.PrintWriter;
 import java.net.Socket;
-
+import java.security.PublicKey;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 
 public class TLSServer {
@@ -21,7 +23,7 @@ public class TLSServer {
 	private SSLServerSocket tlsServerSocket;
 
 	/** the sockets of the clients */
-	private HashMap<Integer, Socket> clients;
+	private HashMap<Integer, SSLSocket> clients;
 
 	/** the clients the server communicates with */
 	private HashMap<Integer, CommunicationServer> comWithClients;
@@ -34,7 +36,7 @@ public class TLSServer {
 	 */
 	public TLSServer(TLSNetwork nc) {
 		super();
-		clients = new HashMap<Integer, Socket>();
+		clients = new HashMap<Integer, SSLSocket>();
 		comWithClients = new HashMap<Integer, CommunicationServer>();
 		this.networkComm = nc;
 	}
@@ -73,10 +75,10 @@ public class TLSServer {
 	 */
 	public void stop() {
 		try {
-			final Collection<Socket> allSockets = this.clients.values();
-			final Iterator<Socket> i = allSockets.iterator();
+			final Collection<SSLSocket> allSockets = this.clients.values();
+			final Iterator<SSLSocket> i = allSockets.iterator();
 			while (i.hasNext()) {
-				final Socket c = i.next();
+				final SSLSocket c = i.next();
 				c.close();
 			}
 			this.tlsServerSocket.close();
@@ -182,15 +184,36 @@ public class TLSServer {
 	 */
 	public synchronized void send(String message) {
 		// this.log("Sending: " + message);
-		final Collection<Socket> allSockets = this.clients.values();
-		final Iterator<Socket> i = allSockets.iterator();
+		final Collection<SSLSocket> allSockets = this.clients.values();
+		final Iterator<SSLSocket> i = allSockets.iterator();
 		while (i.hasNext()) {
-			final Socket c = i.next();
+			final SSLSocket c = i.next();
 			try {
 				sendMessageToClient(c, message);
 			} catch (IOException e) {
 				// this.log("Error sending message");
 			}
 		}
+	}
+
+	/**
+	 * Returns the public key of the peer we connected to.
+	 * 
+	 * @return the public key
+	 * @throws SSLPeerUnverifiedException
+	 *             if the peer wasn't verified
+	 */
+	public synchronized PublicKey getOtherPubKey() throws SSLPeerUnverifiedException {
+		final Collection<SSLSocket> allSockets = this.clients.values();
+		if (allSockets.size() == 1) {
+			final Iterator<SSLSocket> i = allSockets.iterator();
+			while (i.hasNext()) {
+				final SSLSocket c = i.next();
+				SSLSession session = c.getSession();
+				java.security.cert.Certificate cert = session.getPeerCertificates()[0];
+				return cert.getPublicKey();
+			}
+		}
+		return null;
 	}
 }

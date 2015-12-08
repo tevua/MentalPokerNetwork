@@ -12,6 +12,8 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.List;
 
+import javax.net.ssl.SSLPeerUnverifiedException;
+
 /**
  * Test for the network implementation
  * 

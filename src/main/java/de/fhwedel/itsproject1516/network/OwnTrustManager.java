@@ -246,6 +246,7 @@ public class OwnTrustManager implements X509TrustManager {
 	 */
 	private void checkOriginalIsCA(X509Certificate[] chain) throws CertificateException {
 		X509Certificate[] rootCerts = originalManager.getAcceptedIssuers();
+		
 		// return for getBasicConstraints():
 		// the value of pathLenConstraint if the BasicConstraints extension is
 		// present in the certificate and the subject of the certificate is a
