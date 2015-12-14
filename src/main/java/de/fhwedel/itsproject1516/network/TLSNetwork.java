@@ -36,14 +36,17 @@ public class TLSNetwork {
 	/** List of messages */
 	private List<String> messages;
 
+	private TLSNetworkGame game; 
+	
 	/**
 	 * Constructor.
 	 * 
 	 * @param server
 	 *            true if the network instance is a server
 	 */
-	public TLSNetwork(boolean server) {
+	public TLSNetwork(boolean server, TLSNetworkGame aGame) {
 		messages = new LinkedList<String>();
+		this.game = aGame; 
 		if (server) {
 			this.server = new TLSServer(this);
 			this.client = null;
@@ -139,8 +142,7 @@ public class TLSNetwork {
 	 *            the message
 	 */
 	public void receivedMessage(String message) {
-		// TODO
-		// System.out.println(message);
+		this.game.receivedMessage(message);
 		messages.add(message);
 	}
 

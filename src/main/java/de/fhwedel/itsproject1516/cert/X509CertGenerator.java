@@ -1,4 +1,4 @@
-package de.fhwedel.itsproject1516.network;
+package de.fhwedel.itsproject1516.cert;
 
 import java.math.BigInteger;
 import java.security.KeyPair;

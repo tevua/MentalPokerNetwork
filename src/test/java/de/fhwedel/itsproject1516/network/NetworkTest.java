@@ -2,6 +2,9 @@ package de.fhwedel.itsproject1516.network;
 
 import org.junit.Test;
 
+import de.fhwedel.itsproject1516.cert.X509CertGenerator;
+import de.fhwedel.itsproject1516.game.CoinFlipping;
+
 import org.bouncycastle.asn1.x500.X500Name;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -129,8 +132,8 @@ public class NetworkTest {
 	@Test
 	public void simpleNetworkTest() {
 		// System.out.println("simpleNetworkTest");
-		TLSNetwork server = new TLSNetwork(TLSNetwork.SERVER);
-		TLSNetwork client = new TLSNetwork(TLSNetwork.CLIENT);
+		TLSNetwork server = new TLSNetwork(TLSNetwork.SERVER, new CoinFlipping());
+		TLSNetwork client = new TLSNetwork(TLSNetwork.CLIENT, new CoinFlipping());
 
 		server.start(PORT, TRUSTFILE, PASSWORD_TRUST, KEY_ANNA, PASSWORD_KEY, OwnTrustManager.ALWAYS, null, false);
 		shortDelay();
@@ -161,8 +164,8 @@ public class NetworkTest {
 	@Test
 	public void acceptSelfSignedTestAlways() {
 		// System.out.println("acceptSelfSignedTestAlways");
-		TLSNetwork server = new TLSNetwork(TLSNetwork.SERVER);
-		TLSNetwork client = new TLSNetwork(TLSNetwork.CLIENT);
+		TLSNetwork server = new TLSNetwork(TLSNetwork.SERVER, new CoinFlipping());
+		TLSNetwork client = new TLSNetwork(TLSNetwork.CLIENT, new CoinFlipping());
 
 		server.start(PORT, TRUSTFILE, PASSWORD_TRUST, KEY_SELF_SIGNED, PASSWORD_KEY, OwnTrustManager.ALWAYS, null,
 				false);
@@ -194,8 +197,8 @@ public class NetworkTest {
 	@Test
 	public void notAcceptSelfSigned() {
 		// System.out.println("notAcceptSelfSigned");
-		TLSNetwork server = new TLSNetwork(TLSNetwork.SERVER);
-		TLSNetwork client = new TLSNetwork(TLSNetwork.CLIENT);
+		TLSNetwork server = new TLSNetwork(TLSNetwork.SERVER, new CoinFlipping());
+		TLSNetwork client = new TLSNetwork(TLSNetwork.CLIENT, new CoinFlipping());
 
 		server.start(PORT, TRUSTFILE, PASSWORD_TRUST, KEY_SELF_SIGNED, PASSWORD_KEY, OwnTrustManager.NEVER, null,
 				false);
@@ -225,8 +228,8 @@ public class NetworkTest {
 	@Test
 	public void permitSelfSigned() {
 		// System.out.println("permitSelfSigned");
-		TLSNetwork server = new TLSNetwork(TLSNetwork.SERVER);
-		TLSNetwork client = new TLSNetwork(TLSNetwork.CLIENT);
+		TLSNetwork server = new TLSNetwork(TLSNetwork.SERVER, new CoinFlipping());
+		TLSNetwork client = new TLSNetwork(TLSNetwork.CLIENT, new CoinFlipping());
 
 		String string = "j\n";
 		InputStream stringStream = new java.io.ByteArrayInputStream(string.getBytes());
@@ -260,8 +263,8 @@ public class NetworkTest {
 	@Test
 	public void testNotTrustedCert() {
 		// System.out.println("testNotTrustedCert");
-		TLSNetwork server = new TLSNetwork(TLSNetwork.SERVER);
-		TLSNetwork client = new TLSNetwork(TLSNetwork.CLIENT);
+		TLSNetwork server = new TLSNetwork(TLSNetwork.SERVER, new CoinFlipping());
+		TLSNetwork client = new TLSNetwork(TLSNetwork.CLIENT, new CoinFlipping());
 
 		server.start(PORT, TRUSTFILE, PASSWORD_TRUST, KEY_NOT_TRUSTED, PASSWORD_KEY, OwnTrustManager.ALWAYS, null,
 				false);
@@ -292,8 +295,8 @@ public class NetworkTest {
 		// start server (or client) with a self signed cert, tell them to save
 		// it
 		// System.out.println("testSaveSelfSignedCert");
-		TLSNetwork server = new TLSNetwork(TLSNetwork.SERVER);
-		TLSNetwork client = new TLSNetwork(TLSNetwork.CLIENT);
+		TLSNetwork server = new TLSNetwork(TLSNetwork.SERVER, new CoinFlipping());
+		TLSNetwork client = new TLSNetwork(TLSNetwork.CLIENT, new CoinFlipping());
 
 		server.start(PORT, TRUSTFILE_MOD, PASSWORD_TRUST, KEY_ANNA, PASSWORD_KEY, OwnTrustManager.ALWAYS, null, true);
 		shortDelay();
@@ -310,8 +313,8 @@ public class NetworkTest {
 		// start server again but this time without accepting self signed certs,
 		// should still send messages
 
-		TLSNetwork server2 = new TLSNetwork(TLSNetwork.SERVER);
-		TLSNetwork client2 = new TLSNetwork(TLSNetwork.CLIENT);
+		TLSNetwork server2 = new TLSNetwork(TLSNetwork.SERVER, new CoinFlipping());
+		TLSNetwork client2 = new TLSNetwork(TLSNetwork.CLIENT, new CoinFlipping());
 
 		server2.start(PORT, TRUSTFILE_MOD, PASSWORD_TRUST, KEY_ANNA, PASSWORD_KEY, OwnTrustManager.NEVER, null, false);
 		shortDelay();
@@ -342,8 +345,8 @@ public class NetworkTest {
 	@Test
 	public void testSignedByDaisy() {
 		// System.out.println("testSignedByDaisy");
-		TLSNetwork server = new TLSNetwork(TLSNetwork.SERVER);
-		TLSNetwork client = new TLSNetwork(TLSNetwork.CLIENT);
+		TLSNetwork server = new TLSNetwork(TLSNetwork.SERVER, new CoinFlipping());
+		TLSNetwork client = new TLSNetwork(TLSNetwork.CLIENT, new CoinFlipping());
 
 		server.start(PORT, DAISY + ".public", PASSWORD_KEY, KEY_BOB, PASSWORD_KEY, OwnTrustManager.ALWAYS, null, false);
 		shortDelay();
